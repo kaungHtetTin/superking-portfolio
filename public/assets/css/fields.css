@@ -1,0 +1,23 @@
+/* One continuous focus edge. No outside outline or second border on fields. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):focus,
+textarea:focus,
+select:focus {
+    border-color: var(--accent, var(--brand));
+    outline: none;
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 1px var(--accent, var(--brand));
+}
+.editor:focus-within {
+    border-color: var(--accent, var(--brand));
+    box-shadow: inset 0 0 0 1px var(--accent, var(--brand));
+}
+.editor .editor-content:focus-visible {
+    outline: none;
+}
+@media (forced-colors: active) {
+    input:focus, textarea:focus, select:focus, .editor:focus-within {
+        border-color: Highlight;
+        outline: 2px solid Highlight;
+        outline-offset: -2px;
+    }
+}

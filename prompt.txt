@@ -1,0 +1,32 @@
+I want to build a landing page or portfolio website of the oil and lubricant factory company.
+In landing page I want to show
+Company information, 
+Product by categorys
+Contact
+product search function
+
+I want CRUD admin dasboard for portfolio page especially for product CRUD and category system
+
+The product model should have the following field
+
+product image
+product name
+Product Data Sheet PDF
+Safety Dataseet PDF
+Feature and Benefits ( Long description, In admin form, I want mini text editor for this form to get bold, list, etc)
+Applications (Long description, In admin form, I want mini text editor for this form to get bold, list ,etc)
+
+
+For landing page, I want the portfolio web design design mobile and large screen responseive design
+I want professional company design
+I want dense and compact design
+I don't want the lage border radius of the component , but small radius is okay
+I want to dynamically change the logo, favicon and theme color in admin dashboard
+I want the UI component design consistent cross the page, so you need to use common shell level css style
+
+For admin dashboard you can still use the current admin dasboard ui skill
+you need to build CRUD system for product
+CRUD system for owlcarousel
+CRUD system for company information 
+CRUD system for Company Contact
+

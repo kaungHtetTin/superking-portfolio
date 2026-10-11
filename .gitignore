@@ -1,0 +1,10 @@
+/.env
+/storage/logs/*.log
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/preview-*.log
+/storage/qa/
+/public/uploads/*
+!/public/uploads/.htaccess
+!/public/uploads/.gitkeep
+__pycache__/

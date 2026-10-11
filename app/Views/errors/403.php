@@ -1,0 +1,1 @@
+<section class="section container empty"><span class="eyebrow">403</span><h1>Request could not be verified.</h1><p>Your session may have expired. Return to the form and try again.</p><a class="btn btn-primary" href="<?= url('admin') ?>">Return to admin</a></section>
