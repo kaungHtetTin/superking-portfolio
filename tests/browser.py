@@ -1,82 +1,60 @@
-"""Browser checks using installed Playwright and the system Edge browser."""
-import os, pathlib
+"""Read-only responsive/browser checks against the local company website."""
+import os
+from pathlib import Path
 from playwright.sync_api import sync_playwright
-base=os.environ.get('SK_TEST_URL','http://127.0.0.1:8000')
-out=pathlib.Path('storage/qa');out.mkdir(parents=True,exist_ok=True)
-with sync_playwright() as p:
-    browser=p.chromium.launch(channel='msedge',headless=True)
-    page=browser.new_page(viewport={'width':1440,'height':900})
-    errors=[]
-    page.on('pageerror',lambda e:errors.append(str(e)))
-    def visit(path):
-        response=page.goto(base+path);assert response.status==200,(path,response.status)
-        page.wait_for_load_state('networkidle')
-    def fit():
-        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), 'Horizontal page overflow: '+page.url
-    visit('/');fit()
-    assert page.locator('.owl-item.active').count()==1
-    page.screenshot(path=str(out/'home-desktop.png'),full_page=True)
-    page.get_by_role('button',name='Next slide').click()
-    page.wait_for_timeout(550)
-    assert 'The right information' in page.locator('.owl-item.active').inner_text()
-    page.get_by_role('button',name='Previous slide').click()
-    page.get_by_role('searchbox',name='Search products',exact=True).fill('Industrial')
-    page.get_by_role('button',name='Search products').click()
-    assert '2 products' in page.locator('.results-line').inner_text()
-    page.get_by_label('Product category').select_option('1')
-    page.locator('.catalogue-filters').get_by_role('button',name='Search',exact=False).click()
-    assert page.get_by_role('heading',name='No products found.').is_visible()
-    visit('/admin/login')
-    page.get_by_label('Email address').fill('admin@superking.local')
-    page.get_by_label('Password',exact=True).fill(os.environ['SK_ADMIN_PASSWORD'])
-    page.get_by_role('button',name='Sign in').click();page.wait_for_url(base+'/admin')
-    fit();page.screenshot(path=str(out/'admin-desktop.png'),full_page=True)
-    visit('/admin/products/create');fit()
-    page.get_by_label('Product name',exact=False).fill('Browser validation product')
-    content=page.get_by_role('textbox',name='Features & benefits',exact=True)
-    content.fill('Formatted product benefit');content.press('Control+a')
-    page.get_by_role('button',name='Bold',exact=True).first.click()
-    assert '<b>' in content.inner_html() or '<strong>' in content.inner_html()
-    page.get_by_label('Product category').select_option('1')
-    page.get_by_label('Published on website').check()
-    page.get_by_role('button',name='Save changes').click();page.wait_for_url(base+'/admin/products')
-    row=page.get_by_role('row').filter(has_text='Browser validation product')
-    assert row.is_visible()
-    row.get_by_role('button',name='Delete Browser validation product',exact=True).click()
-    assert page.get_by_role('dialog').is_visible()
-    page.get_by_role('button',name='Cancel',exact=True).click()
-    assert row.is_visible()
-    row.get_by_role('button',name='Delete Browser validation product',exact=True).click()
-    page.get_by_role('button',name='Delete record',exact=True).click()
-    page.wait_for_load_state('networkidle');assert row.count()==0
-    page.set_viewport_size({'width':1280,'height':720})
-    page.get_by_role('button',name='Dark mode',exact=True).click()
-    assert page.locator('body').get_attribute('data-theme')=='dark'
-    visit('/admin');fit();page.screenshot(path=str(out/'admin-dark.png'),full_page=True)
-    page.get_by_role('button',name='Comfortable',exact=True).click()
-    assert page.locator('body').get_attribute('data-density')=='comfortable';fit()
-    page.screenshot(path=str(out/'admin-comfortable.png'),full_page=True)
-    page.set_viewport_size({'width':1024,'height':768});visit('/');fit()
-    page.set_viewport_size({'width':390,'height':844});visit('/');fit()
-    page.screenshot(path=str(out/'home-mobile.png'),full_page=True)
-    page.get_by_role('button',name='Open navigation').click()
-    assert page.get_by_role('navigation',name='Main navigation').is_visible()
-    page.keyboard.press('Escape');assert not page.get_by_role('navigation',name='Main navigation').is_visible()
-    for path in ['/products','/products/1','/company','/contact']:
-        visit(path);fit()
-    visit('/admin/products');fit()
-    page.get_by_role('button',name='Toggle sidebar').click()
-    assert 'sidebar-open' in page.locator('body').get_attribute('class')
-    page.get_by_role('button',name='Close navigation',exact=True).click()
-    page.screenshot(path=str(out/'admin-mobile.png'),full_page=True)
-    visit('/admin/products/create');fit();page.screenshot(path=str(out/'admin-form-mobile.png'),full_page=True)
-    visit('/admin/settings');fit()
-    page.get_by_role('button',name='Light mode',exact=True).click()
-    page.get_by_role('button',name='Compact',exact=True).click()
-    fit()
-    page.screenshot(path=str(out/'settings-mobile.png'),full_page=True)
-    page.emulate_media(reduced_motion='reduce')
-    visit('/');fit();assert not page.locator('.carousel-pause').count()
-    assert not errors,errors
-    print('PASS: desktop/tablet/mobile layouts, carousel, product search, editor bold formatting, product create/delete, delete cancellation, light/dark, compact/comfortable, mobile navigation, reduced motion, zero JavaScript errors.')
+
+BASE = os.environ.get('SK_TEST_URL', 'http://localhost/superking-website').rstrip('/')
+out = Path(__file__).resolve().parents[1] / 'storage/qa'
+out.mkdir(parents=True, exist_ok=True)
+routes = ['/', '/company', '/products', '/manufacturing', '/knowledge', '/news', '/dealers', '/distributor', '/contact', '/privacy']
+with sync_playwright() as playwright:
+    browser = playwright.chromium.launch(channel='msedge', headless=True)
+    page = browser.new_page()
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    for width, height in [(1920, 1080), (1440, 960), (1280, 800), (1100, 800), (1024, 768), (768, 1024), (390, 844), (320, 700)]:
+        page.set_viewport_size({'width': width, 'height': height})
+        for path in routes + [path + '?lang=my' for path in routes]:
+            response = page.goto(BASE + path)
+            assert response.status == 200, (path, response.status)
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (width, path)
+            too_small = page.locator('main p, main label, main .btn, main .eyebrow, .range-number, .card-bottom, .footer-grid a, .footer-bottom').evaluate_all("elements => elements.filter(element => element.getClientRects().length && parseFloat(getComputedStyle(element).fontSize) < 14).map(element => ({text: element.textContent.slice(0, 60), size: getComputedStyle(element).fontSize}))")
+            assert not too_small, (width, path, too_small)
+            padding = page.locator('main > .section').first.evaluate('element => parseFloat(getComputedStyle(element).paddingTop)')
+            assert padding <= (32 if width <= 760 else 48), (width, path, padding)
+            if width <= 760:
+                assert page.locator('main input:not([type=hidden]):not([type=checkbox]), main select, main textarea').evaluate_all('elements => elements.every(element => parseFloat(getComputedStyle(element).fontSize) >= 16)'), (width, path)
+            page.locator('img[loading=lazy]').evaluate_all("images => images.forEach(image => image.loading = 'eager')")
+            page.wait_for_function("Array.from(document.images).every(image => image.complete && image.naturalWidth > 0)", timeout=15000)
+            assert not page.locator('img').evaluate_all('(images) => images.some(image => !image.complete || image.naturalWidth === 0)'), path
+        page.goto(BASE + '/')
+        if width in [1440, 390]:
+            page.screenshot(path=str(out / ('concept-home-desktop.png' if width == 1440 else 'concept-home-mobile.png')), full_page=True)
+            page.screenshot(path=str(out / ('readability-desktop.png' if width == 1440 else 'readability-mobile.png')))
+    page.set_viewport_size({'width': 390, 'height': 844})
+    page.goto(BASE)
+    page.get_by_role('button', name='Open navigation').click()
+    assert page.get_by_role('navigation', name='Main navigation').is_visible()
+    page.keyboard.press('Escape')
+    assert page.locator('.menu-toggle').get_attribute('aria-expanded') == 'false'
+    page.locator('.language-switch').click()
+    assert page.locator('html').get_attribute('lang') == 'my'
+    page.get_by_role('link', name='Switch to English').click()
+    assert page.locator('html').get_attribute('lang') == 'en'
+    page.goto(BASE + '/products')
+    page.get_by_label('Search products', exact=True).fill('readability-check-missing-product')
+    page.locator('.catalogue-filters').get_by_role('button', name='Search', exact=False).click()
+    assert 'readability-check-missing-product' in page.url
+    page.locator('.catalogue-filters').get_by_role('link', name='Reset', exact=True).click()
+    assert page.get_by_label('Search products', exact=True).input_value() == ''
+    page.go_back()
+    assert page.get_by_label('Search products', exact=True).input_value() == 'readability-check-missing-product'
+    page.goto(BASE + '/distributor')
+    page.get_by_role('button', name='Send Inquiry', exact=False).click()
+    assert page.locator('#full_name').evaluate('(element) => !element.validity.valid')
+    page.set_viewport_size({'width': 1440, 'height': 960})
+    page.goto(BASE + '/knowledge')
+    page.screenshot(path=str(out / 'concept-knowledge-desktop.png'), full_page=True)
+    assert not errors, errors
     browser.close()
+print('PASS: all public pages in both languages at eight widths; readable type, compact spacing, images, navigation, search/reset/Back, required fields and browser errors.')

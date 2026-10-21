@@ -1,0 +1,40 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 660 >>
+stream
+0.12 0.12 0.12 rg 0 690 612 102 re f
+1 0.82 0.19 rg BT /F1 22 Tf 40 748 Td (SUPERKING - DEMO ATTACHMENT) Tj ET
+0.76 0.07 0.12 rg BT /F1 18 Tf 40 650 Td (NOT APPROVED FOR PUBLICATION) Tj ET
+0.12 0.12 0.12 rg BT /F1 17 Tf 40 612 Td (Technical-document training attachment) Tj ET
+BT /F1 11 Tf 40 570 Td (This is not a Technical Data Sheet or Safety Data Sheet.) Tj ET
+BT /F1 11 Tf 40 547 Td (No product values, performance claims or approvals are stated.) Tj ET
+BT /F1 11 Tf 40 524 Td (Do not use this file for product selection, safety or handling.) Tj ET
+BT /F1 11 Tf 40 501 Td () Tj ET
+BT /F1 11 Tf 40 478 Td (DEMO ONLY. Not for commercial distribution.) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1022
+%%EOF

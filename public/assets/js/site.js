@@ -1,18 +1,32 @@
 (() => {
   const menu = document.querySelector('.menu-toggle'), nav = document.querySelector('#site-nav');
-  menu?.addEventListener('click', () => { const open = nav.classList.toggle('open'); menu.setAttribute('aria-expanded', String(open)); menu.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation'); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav?.classList.contains('open')) { nav.classList.remove('open'); menu.setAttribute('aria-expanded','false'); menu.focus(); } });
-  const carousel=document.querySelector('.hero-carousel');
-  if (carousel && window.jQuery?.fn.owlCarousel) {
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const multiple = carousel.children.length>1;
-    const autoplay = carousel.dataset.autoplay==='1' && !reduced && multiple;
-    const syncSlides=()=>{carousel.querySelectorAll('.owl-item').forEach(item=>{const active=item.classList.contains('active');item.setAttribute('aria-hidden',String(!active));item.querySelectorAll('a,button').forEach(link=>{if(active)link.removeAttribute('tabindex');else link.setAttribute('tabindex','-1');});});};
-    jQuery(carousel).on('initialized.owl.carousel translated.owl.carousel',syncSlides);
-    jQuery(carousel).owlCarousel({items:1,loop:multiple,nav:multiple,dots:multiple,autoplay,autoplayTimeout:6500,autoplayHoverPause:true,smartSpeed:reduced?0:450,navText:['<span aria-hidden="true">←</span>','<span aria-hidden="true">→</span>']});
-    document.querySelector('.owl-prev')?.setAttribute('aria-label','Previous slide');
-    document.querySelector('.owl-next')?.setAttribute('aria-label','Next slide');
-    document.querySelectorAll('.owl-dot').forEach((dot,i)=>dot.setAttribute('aria-label',`Go to slide ${i+1}`));
-    if(autoplay){const pause=document.createElement('button');pause.className='btn carousel-pause';pause.textContent='Pause slides';pause.setAttribute('aria-pressed','false');carousel.parentElement.append(pause);pause.addEventListener('click',()=>{const paused=pause.getAttribute('aria-pressed')!=='true';jQuery(carousel).trigger(paused?'stop.owl.autoplay':'play.owl.autoplay');pause.setAttribute('aria-pressed',String(paused));pause.textContent=paused?'Play slides':'Pause slides';});}
+  const closeMenu = () => { if(!menu || !nav) return; nav.classList.remove('open'); menu.setAttribute('aria-expanded','false'); };
+  menu?.addEventListener('click', () => { const open = nav.classList.toggle('open'); menu.setAttribute('aria-expanded', String(open)); });
+  document.addEventListener('keydown', event => { if(event.key==='Escape' && nav?.classList.contains('open')) { closeMenu(); menu.focus(); } });
+  document.addEventListener('click', event => { if(!event.target.closest('.site-header')) closeMenu(); });
+  matchMedia('(min-width:1081px)').addEventListener('change', event => { if(event.matches) closeMenu(); });
+  const consent = document.querySelector('.analytics-consent'), key='superking-analytics-consent';
+  const readConsent=()=>{try{return localStorage.getItem(key);}catch{return null;}};
+  const saveConsent=value=>{try{localStorage.setItem(key,value);}catch{/* Storage may be disabled. */}};
+  const startAnalytics = () => {
+    if(!consent || document.querySelector('[data-superking-analytics]')) return;
+    const id=consent.dataset.measurement;
+    window.dataLayer=window.dataLayer||[];
+    window.gtag=function(){window.dataLayer.push(arguments);};
+    window.gtag('js',new Date()); window.gtag('config',id,{anonymize_ip:true});
+    const script=document.createElement('script'); script.async=true; script.dataset.superkingAnalytics='1';
+    script.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(id); document.head.append(script);
+  };
+  if(consent) {
+    const choice=readConsent(); consent.hidden=choice!==null;
+    if(choice==='yes') startAnalytics();
+    consent.querySelectorAll('[data-consent]').forEach(button=>button.addEventListener('click',()=>{
+      saveConsent(button.dataset.consent); consent.hidden=true; if(button.dataset.consent==='yes')startAnalytics();
+    }));
   }
+  document.querySelector('#reset-consent')?.addEventListener('click',()=>{
+    try{localStorage.removeItem(key);}catch{/* Storage may be disabled. */}
+    // Reload stops an already loaded analytics script and shows the choice again.
+    location.reload();
+  });
 })();

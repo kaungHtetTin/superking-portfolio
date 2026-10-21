@@ -1,0 +1,412 @@
+ SUPERKING LUBRICANTS
+
+Website Development Requirements & Project Brief
+
+Prepared for: Website Developer / Web Development Agency
+Brand: SUPERKING LUBRICANTS
+Company: Royal Myanmar King Company Limited
+Project Objective: Brand Trust, Local Market Growth & International Export Development
+
+1. Project Background
+
+SUPERKING LUBRICANTS has been imported from the UAE and distributed in Myanmar since 2016 under Royal Myanmar King Company Limited.
+
+The company is now preparing to establish local manufacturing operations in Myanmar. As the brand enters this new stage, we want to strengthen customer confidence, communicate our product quality and manufacturing capabilities transparently, and establish SUPERKING as a competitive lubricant brand in both the Myanmar market and international markets.
+
+Although many existing customers have positive experiences with SUPERKING products, we recognize that further work is needed to strengthen brand trust and awareness. Our website must therefore serve as more than a product catalogue. It should become an official platform for brand credibility, technical education, customer support, distributor development and international business inquiries.
+
+2. Main Objectives
+
+The website must be developed with the following objectives:
+
+1. Build customer trust: Clearly communicate our company background, brand history, manufacturing operations, product information and quality-control practices.
+2. Establish SUPERKING’s local manufacturing identity: Explain the transition from importing finished products from the UAE to manufacturing in Myanmar, using accurate and verifiable information.
+3. Support Myanmar customers: Help customers understand products, select suitable lubricants and find authorized dealers.
+4. Develop international business: Present SUPERKING professionally to overseas distributors, importers, wholesalers and potential business partners.
+5. Provide lubricant knowledge: Build a dedicated educational section covering engine oils, lubricant specifications, maintenance and correct product selection.
+6. Maintain consistent branding: Ensure that the entire website follows the official SUPERKING Brand Guideline.
+7. Support long-term growth: Build a website that can be expanded as our product range, manufacturing capacity and export markets grow.
+
+3. Brand Guideline & Visual Identity
+
+The website design must follow the official SUPERKING Brand Guideline supplied by our company.
+
+The developer must:
+
+• Use the official SUPERKING logo and approved brand assets.
+• Follow the official brand colours, colour codes, typography, spacing and logo-clear-space rules specified in the guideline.
+• Maintain a consistent visual identity across desktop, mobile, product pages, banners, icons and downloadable documents.
+• Use a professional industrial and automotive visual style that communicates performance, quality, reliability and confidence.
+• Avoid unnecessary visual effects, excessive colours, cluttered layouts or inconsistent graphic styles.
+• Use genuine SUPERKING product photographs, approved packaging designs and actual manufacturing-facility photographs wherever possible.
+• Avoid generating or publishing artificial product images that alter the real packaging, logo, specifications or product appearance.
+• Ensure that Burmese and English text are both clear and readable.
+
+Before development begins, please review the complete Brand Guideline and prepare a website design concept for our approval.
+
+4. Website Language & Structure
+
+The website should be designed for both the Myanmar market and international audiences.
+
+Required languages:
+
+• English
+• Myanmar
+
+English should be suitable for international visitors and export inquiries. Myanmar-language content should provide clear and accessible information for local customers.
+
+The website should be mobile-first, responsive and easy to navigate on smartphones, tablets and computers.
+
+Recommended main navigation:
+
+1. Home
+2. About SUPERKING
+3. Products
+4. Manufacturing & Quality
+5. Lubricant Knowledge Center
+6. Find a Dealer
+7. Become a Distributor
+8.
+[10/20/2026 3:38 PM] Kaung Htet: News & Updates
+9. Contact Us
+
+The navigation should remain simple, professional and user-friendly.
+
+5. Homepage Requirements
+
+The homepage should communicate our brand identity, credibility and product range immediately.
+
+Please include the following sections:
+
+A. Main Banner
+
+A premium, professional banner featuring the SUPERKING brand and genuine products.
+
+Suggested headline:
+
+“SUPERKING LUBRICANTS
+Engineered for Performance. Built on Trust.”
+
+Suggested supporting message:
+
+“Lubrication Solutions for Myanmar and Global Markets.”
+
+The banner should include clear links to Explore Products and Become a Distributor.
+
+B. Brand Introduction
+
+Briefly introduce SUPERKING, its history in Myanmar since 2016, Royal Myanmar King Company Limited and the company’s long-term commitment to product quality, customer value and dependable support.
+
+C. Product Categories
+
+Display our available lubricant categories using genuine product images. Visitors should be able to select a category and access detailed product information.
+
+D. Manufacturing in Myanmar
+
+Introduce our Myanmar manufacturing project and facility using verified photographs, accurate descriptions and approved information. This section should be updated as the factory progresses through installation, commissioning and production.
+
+E. Quality & Technical Information
+
+Explain our quality-control approach, product specifications and available technical documents. Display certifications and compliance claims only when they are supported by valid documentation.
+
+F. Lubricant Knowledge
+
+Feature useful articles that help customers select and use lubricants correctly.
+
+G. Dealer & Distributor Opportunities
+
+Provide direct links for customers looking for dealers and overseas businesses interested in distribution partnerships.
+
+H. Contact & Customer Support
+
+Display verified company contact details and appropriate customer inquiry channels.
+
+6. Product Catalogue & Individual Product Pages
+
+Every product should have a dedicated page. The page must provide accurate, structured and useful technical information.
+
+Where applicable, include:
+
+• Official product name and product code
+• Genuine product images
+• Product category
+• SAE viscosity grade
+• API, JASO or other applicable specifications, where supported by documentation
+• Recommended applications
+• Intended vehicle or equipment types
+• Available package sizes
+• Product description and key characteristics
+• Technical Data Sheet (TDS), where available
+• Safety Data Sheet (SDS), where available
+• Storage and handling information, where relevant
+• Product-selection guidance
+• Contact or dealer inquiry link
+
+The product catalogue should be easy to search and filter by product category, viscosity grade, application and specification where applicable.
+
+Important: The developer must not create technical specifications, performance claims, API licensing claims, OEM approvals or certifications without confirmation from our company and supporting documents.
+
+7. Manufacturing & Quality Assurance
+
+This section is especially important for strengthening customer trust.
+
+It should explain:
+
+• SUPERKING’s history in the Myanmar market since 2016.
+• The company’s previous UAE import and distribution operations.
+• The development of local manufacturing in Myanmar.
+• The actual manufacturing process and equipment, once verified and available for publication.
+• Raw-material sourcing information, where disclosure is authorized and documented.
+• Blending, filling, packaging and product traceability procedures, where applicable.
+• Laboratory testing and quality-control procedures actually performed.
+• Batch identification and customer complaint-handling processes, where implemented.
+• Applicable quality-management certifications and other verified compliance documents.
+
+Please create a professional page layout that allows us to add actual factory photographs, equipment photographs, laboratory information, certificates and production updates over time.
+[10/20/2026 3:38 PM] Kaung Htet: Do not describe planned facilities or procedures as fully operational until they have been completed and verified.
+
+8. Lubricant Knowledge Center
+
+We want to develop a dedicated SUPERKING Lubricant Knowledge Center.
+
+This is a strategic part of the website, not just a blog. It should educate customers, help them make better product choices, improve search visibility and build confidence in the brand.
+
+Recommended content categories include:
+
+A. Engine Oil Fundamentals
+
+• What engine oil does and why it is important.
+• Differences between mineral, semi-synthetic and fully synthetic oils.
+• Understanding SAE viscosity grades.
+• Understanding API engine-oil classifications.
+• Understanding JASO specifications for motorcycle oils.
+
+B. Motorcycle Lubricants
+
+• How to choose motorcycle engine oil.
+• Differences between 4-stroke and 2-stroke lubricants.
+• Understanding motorcycle oil viscosity and specifications.
+• Common oil-selection mistakes.
+• How riding conditions and maintenance affect oil performance.
+
+C. Passenger Car Lubricants
+
+• Choosing engine oil according to the vehicle owner’s manual.
+• Understanding 5W-30, 10W-40 and 20W-50.
+• When viscosity alone is not enough to choose an oil.
+• Engine-oil change intervals and maintenance considerations.
+
+D. Heavy-Duty & Commercial Vehicles
+
+• Diesel engine-oil specifications.
+• Understanding products such as CI-4 and other relevant classifications.
+• Lubrication considerations for trucks, buses and commercial vehicles.
+• Operating conditions, maintenance and oil-selection factors.
+
+E. Other Lubricants
+
+• Hydraulic oils.
+• Gear oils.
+• Automatic transmission fluids.
+• Brake fluids.
+• Other product categories offered by SUPERKING.
+
+F. Myanmar Operating Conditions
+
+• Lubricant selection for local driving and operating conditions.
+• Dust, traffic congestion, heavy loads and temperature considerations.
+• Maintenance guidance for motorcycles, passenger cars and commercial vehicles.
+
+G. Frequently Asked Questions
+
+• How do I choose the correct engine oil?
+• Can I change from one viscosity grade to another?
+• How do I read an oil container label?
+• How can I check whether a product is genuine?
+• Where can I purchase SUPERKING products?
+• What should I do if I have a product-related question?
+
+Every technical article must be accurate, practical and easy to understand. Articles should be reviewed by a qualified technical person before publication.
+
+Do not recommend a lubricant solely because it is thicker, cheaper or more suitable for a particular climate. Product selection must consider the manufacturer’s requirements, applicable specifications and the actual operating conditions.
+
+Where appropriate, articles should link readers to relevant SUPERKING products without making unsupported performance claims.
+
+9. Customer Trust & Genuine Product Verification
+
+Please propose features that can help customers identify genuine SUPERKING products and obtain reliable support.
+
+Possible features include:
+
+• A guide to identifying genuine packaging.
+• An official dealer directory.
+• A product inquiry and complaint form.
+• Batch-number or QR-code verification, if a suitable verification system is implemented.
+• A clear explanation of how customers can contact the company.
+• Official announcements regarding packaging changes, new products and distribution updates.
+
+If QR verification is proposed, please explain how the verification database, product codes and customer-facing results will work. Do not display a verification feature as operational until the company has implemented and tested it.
+
+10. International Distributor & Export Inquiry
+
+The website must be ready to support international business development.
+
+Please create a dedicated Become a Distributor / Export Inquiry page with a professional business inquiry form.
+
+Recommended form fields:
+
+• Full name
+• Company name
+• Country
+• Email address
+• Telephone or WhatsApp number
+• Business type
+• Interested product categories
+• Estimated purchasing volume
+• Existing distribution network
+• Message or business requirements
+[10/20/2026 3:38 PM] Kaung Htet: The form should allow us to receive inquiries from overseas importers, distributors, wholesalers and potential business partners.
+
+Please also include:
+
+• A professional company profile.
+• A downloadable product catalogue.
+• Technical documents where available and approved for distribution.
+• Verified manufacturing and company information.
+• International business contact details.
+• Clear inquiry-submission confirmation.
+• Spam protection and secure handling of submitted information.
+
+The website should be structured so that additional language versions, export-market information and downloadable documents can be added later.
+
+11. Dealer Locator & Myanmar Customer Support
+
+For the Myanmar market, please develop a practical system that helps customers locate genuine SUPERKING products.
+
+Preferred features:
+
+• Dealer directory by region and city.
+• Search by township or location.
+• Dealer contact details and location information.
+• Google Maps integration where appropriate.
+• Messenger, Viber, WhatsApp or telephone contact options, according to our confirmed official channels.
+• Customer inquiry and feedback forms.
+
+The dealer locator should be manageable by our company staff so that dealer details can be updated without requiring the developer to make every change.
+
+12. News, Articles & Content Management
+
+The website should include a Content Management System (CMS) that allows our staff to update:
+
+• Product information.
+• Lubricant Knowledge Center articles.
+• News and company announcements.
+• Manufacturing progress.
+• Product catalogues and technical documents.
+• Dealer information.
+• Contact details and promotional banners.
+
+Our team should be able to publish and update content without advanced programming knowledge.
+
+Please demonstrate the CMS and provide basic staff training before the project is handed over.
+
+13. Technical & Security Requirements
+
+The website must meet professional standards for performance, usability, security and search visibility.
+
+Please include:
+
+• Responsive design for mobile, tablet and desktop.
+• HTTPS/SSL security.
+• Fast page loading and optimized images.
+• Clear navigation and accessible text contrast.
+• Search-engine-friendly URLs and page titles.
+• Editable meta descriptions and image alt text.
+• XML sitemap and robots.txt configuration.
+• Appropriate structured data where applicable.
+• Google Analytics 4 and Google Search Console setup.
+• Contact-form spam protection.
+• Regular backup and recovery arrangements.
+• CMS, theme and plugin update procedures, if applicable.
+• Appropriate access control for administrators and staff.
+• Privacy notice and consent arrangements where required.
+• Basic security monitoring and maintenance support.
+
+Please aim for Google’s Core Web Vitals targets: LCP of 2.5 seconds or less, INP of 200 milliseconds or less, and CLS of 0.1 or less, measured at the 75th percentile when sufficient field data is available. Explain how performance will be tested and improved.
+
+14. SEO & International Visibility
+
+The website must be structured to help potential customers discover SUPERKING through search engines.
+
+Please provide:
+
+• SEO setup for Myanmar and international audiences.
+• Separate, properly optimized English and Myanmar pages.
+• Keyword research for lubricant products and technical topics.
+• Product and educational article SEO.
+• Image optimization and descriptive alt text.
+• Proper internal linking between products and educational articles.
+• Technical SEO checks before launch.
+• Google Search Console and Analytics configuration.
+• A content plan for improving search visibility over time.
+
+Please avoid keyword stuffing, duplicate pages and misleading claims.
+
+15. Design & Development Deliverables
+
+Before development begins, please submit:
+
+1. Website sitemap and navigation structure.
+2. Homepage wireframe.
+3. Homepage design concept following the SUPERKING Brand Guideline.
+4. Product-page design.
+5. Knowledge Center article-page design.
+6. Manufacturing & Quality page design.
+7. Dealer Locator design.
+8. Distributor inquiry form design.
+9.
+[10/20/2026 3:38 PM] Kaung Htet: Mobile-responsive design preview.
+
+After design approval, proceed with development and testing.
+
+The final handover should include:
+
+• A fully functional website.
+• Administrative login and CMS training.
+• Domain and hosting information.
+• Source code or agreed development files.
+• Backup and restoration instructions.
+• Technical documentation.
+• Basic SEO configuration.
+• Analytics and Search Console access.
+• Warranty period and maintenance quotation.
+
+The company should retain ownership or appropriate administrative control of its domain, website, content, accounts and relevant assets.
+
+16. Project Proposal & Quotation Required
+
+Please submit a proposal that clearly explains:
+
+• Recommended technology and CMS.
+• Proposed website structure.
+• Design and development timeline.
+• Total project cost, including domain and hosting if applicable.
+• Any annual or recurring charges.
+• Content entry and translation costs.
+• SEO setup costs.
+• Security, backup and maintenance costs.
+• Post-launch support and warranty.
+• Additional costs for future features.
+• Payment milestones and project handover terms.
+
+Please separate essential launch features from optional future features so that we can prioritize the project effectively.
+
+17. Final Direction
+
+We do not want a website that only displays product photographs and contact numbers. We want a professional brand platform that helps customers understand SUPERKING, builds confidence through transparent and verifiable information, provides useful lubricant knowledge, supports our Myanmar manufacturing development and attracts international distribution opportunities.
+
+Our long-term ambition is to build SUPERKING into a trusted lubricant brand that can compete in international markets.
+
+Please develop the website with that long-term objective in mind, while maintaining the official SUPERKING Brand Guideline and ensuring that all technical information, certifications, manufacturing claims and product specifications are accurate and approved by our company.
+
+Please submit your proposed sitemap, homepage design concept, technical approach, timeline and quotation for our review before beginning full development.

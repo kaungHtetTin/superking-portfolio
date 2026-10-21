@@ -9,13 +9,23 @@ use Mini\Database;
 $command = $argv[1] ?? 'help';
 $databaseName = (string) env('DB_DATABASE', 'mini_app');
 
-function ensureDatabase(string $databaseName): void
+function validateDatabaseName(string $databaseName): void
 {
     if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $databaseName)) {
         throw new InvalidArgumentException('DB_DATABASE must be a valid SQL identifier.');
     }
+}
+
+function createDatabase(string $databaseName): void
+{
+    validateDatabaseName($databaseName);
     $pdo = Database::connection(true);
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$databaseName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+}
+
+function ensureDatabase(string $databaseName): void
+{
+    createDatabase($databaseName);
     $pdo = Database::connection();
     $pdo->exec("CREATE TABLE IF NOT EXISTS migrations (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, migration VARCHAR(255) NOT NULL UNIQUE, batch INT NOT NULL, migrated_at DATETIME NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 }
@@ -27,38 +37,116 @@ function migrationFiles(): array
     return $files;
 }
 
+function runMigrations(string $databaseName): void
+{
+    ensureDatabase($databaseName);
+    $pdo = Database::connection();
+    $applied = $pdo->query('SELECT migration FROM migrations')->fetchAll(PDO::FETCH_COLUMN);
+    $batch = (int) $pdo->query('SELECT COALESCE(MAX(batch), 0) + 1 FROM migrations')->fetchColumn();
+    $count = 0;
+    foreach (migrationFiles() as $file) {
+        $name = basename($file);
+        if (in_array($name, $applied, true)) {
+            echo "SKIP  {$name}\n";
+            continue;
+        }
+        $migration = (static fn(string $migrationFile): array => require $migrationFile)($file);
+        foreach ($migration['up'] as $sql) {
+            $pdo->exec($sql);
+        }
+        $stmt = $pdo->prepare('INSERT INTO migrations (migration, batch, migrated_at) VALUES (?, ?, NOW())');
+        $stmt->execute([$name, $batch]);
+        echo "DONE  {$name}\n";
+        $count++;
+    }
+    echo $count ? "Applied {$count} migration(s).\n" : "Database is up to date.\n";
+}
+
+function seedDatabase(array $options=[]): void
+{
+    foreach($options as $option)if($option!=='--minimal')throw new InvalidArgumentException("Unknown db:seed option: {$option}. Use --minimal for initial setup only.");
+    $seedProfile=in_array('--minimal',$options,true)?'minimal':(string)env('SEED_PROFILE','demo');
+    $seed = BASE_PATH . '/database/seed.php';
+    if (!is_file($seed)) {
+        throw new RuntimeException('No database/seed.php has been defined.');
+    }
+    require $seed;
+}
+
+function freshDatabase(string $databaseName, array $options): void
+{
+    foreach ($options as $option) {
+        if (!in_array($option, ['--seed', '--force', '--minimal'], true)) {
+            throw new InvalidArgumentException("Unknown migrate:fresh option: {$option}. Use --seed, --minimal or --force.");
+        }
+    }
+    validateDatabaseName($databaseName);
+    if (in_array(strtolower($databaseName), ['mysql', 'information_schema', 'performance_schema', 'sys'], true)) {
+        throw new RuntimeException('Refusing to reset a MySQL system database.');
+    }
+    if (migrationFiles() === []) {
+        throw new RuntimeException('No migration files found. Database was not reset.');
+    }
+    $seed = in_array('--seed', $options, true);
+    if(in_array('--minimal',$options,true)&&!$seed)throw new InvalidArgumentException('--minimal requires --seed when used with migrate:fresh.');
+    if($seed&&!in_array(in_array('--minimal',$options,true)?'minimal':(string)env('SEED_PROFILE','demo'),['demo','minimal'],true))throw new InvalidArgumentException('SEED_PROFILE must be demo or minimal. Database was not reset.');
+    if ($seed && !is_file(BASE_PATH . '/database/seed.php')) {
+        throw new RuntimeException('No database/seed.php has been defined. Database was not reset.');
+    }
+    echo "Target database: {$databaseName} on " . env('DB_HOST', '127.0.0.1') . ':' . env('DB_PORT', '3306') . "\n";
+    echo "WARNING: All tables, views and records in this database will be permanently deleted, including admin accounts. Uploaded files are retained.\n";
+    if (!in_array('--force', $options, true)) {
+        echo "Type the database name to continue (anything else cancels): ";
+        $answer = fgets(STDIN);
+        if ($answer === false || trim($answer) !== $databaseName) {
+            throw new RuntimeException('Reset cancelled. Database was not changed.');
+        }
+    }
+    createDatabase($databaseName);
+    $pdo = Database::connection();
+    $stmt = $pdo->prepare('SELECT TABLE_NAME, TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME');
+    $stmt->execute([$databaseName]);
+    $objects = $stmt->fetchAll();
+    $foreignKeys = (int) $pdo->query('SELECT @@SESSION.FOREIGN_KEY_CHECKS')->fetchColumn();
+    $pdo->exec('SET SESSION FOREIGN_KEY_CHECKS = 0');
+    try {
+        // Remove views first, then tables, including objects not tracked by migrations.
+        foreach (['views', 'tables'] as $group) {
+            foreach ($objects as $object) {
+                $view = $object['TABLE_TYPE'] === 'VIEW';
+                if ($view !== ($group === 'views')) continue;
+                $name = str_replace('`', '``', $object['TABLE_NAME']);
+                $pdo->exec('DROP ' . ($view ? 'VIEW' : 'TABLE') . " IF EXISTS `{$databaseName}`.`{$name}`");
+            }
+        }
+    } finally {
+        $pdo->exec('SET SESSION FOREIGN_KEY_CHECKS = ' . $foreignKeys);
+    }
+    echo 'Dropped ' . count($objects) . " database object(s).\n";
+    runMigrations($databaseName);
+    if ($seed) seedDatabase(in_array('--minimal',$options,true)?['--minimal']:[]);
+    echo "Fresh migration complete.\n";
+}
+
 try {
+    if ($command === 'content:publish-demo') {
+        if(count($argv)>2)throw new InvalidArgumentException('content:publish-demo takes no options.');
+        foreach(\App\Content\DemoContent::publish() as $table=>$count)echo "$table: $count demo records published\n";
+        echo "Demo content is visible with sample labels. Verification, reviewers, private records and existing photos are preserved.\n";
+        exit(0);
+    }
     if ($command === 'new') {
         \Mini\Starter::create($argv[2] ?? '');
         exit(0);
     }
 
     if ($command === 'migrate') {
-        ensureDatabase($databaseName);
-        $pdo = Database::connection();
-        $applied = $pdo->query('SELECT migration FROM migrations')->fetchAll(PDO::FETCH_COLUMN);
-        $batch = (int) $pdo->query('SELECT COALESCE(MAX(batch), 0) + 1 FROM migrations')->fetchColumn();
-        $count = 0;
-        foreach (migrationFiles() as $file) {
-            $name = basename($file);
-            if (in_array($name, $applied, true)) {
-                echo "SKIP  {$name}\n";
-                continue;
-            }
-            $migration = require $file;
-            try {
-                foreach ($migration['up'] as $sql) {
-                    $pdo->exec($sql);
-                }
-                $stmt = $pdo->prepare('INSERT INTO migrations (migration, batch, migrated_at) VALUES (?, ?, NOW())');
-                $stmt->execute([$name, $batch]);
-                echo "DONE  {$name}\n";
-                $count++;
-            } catch (Throwable $e) {
-                throw $e;
-            }
-        }
-        echo $count ? "Applied {$count} migration(s).\n" : "Database is up to date.\n";
+        runMigrations($databaseName);
+        exit(0);
+    }
+
+    if ($command === 'migrate:fresh') {
+        freshDatabase($databaseName, array_slice($argv, 2));
         exit(0);
     }
 
@@ -82,7 +170,10 @@ try {
         $rows = Database::fetchAll('SELECT migration FROM migrations WHERE batch = ? ORDER BY id DESC', [$batch]);
         foreach ($rows as $row) {
             $file = BASE_PATH . '/migrations/' . $row['migration'];
-            $migration = require $file;
+            $migration = (static fn(string $migrationFile): array => require $migrationFile)($file);
+            if (empty($migration['down'])) {
+                throw new RuntimeException('This migration is forward-only. Restore a matched database/upload backup to recover an earlier version.');
+            }
             foreach ($migration['down'] as $sql) {
                 Database::connection()->exec($sql);
             }
@@ -94,20 +185,19 @@ try {
 
     if ($command === 'db:seed') {
         ensureDatabase($databaseName);
-        $seed = BASE_PATH . '/database/seed.php';
-        if (!is_file($seed)) {
-            throw new RuntimeException('No database/seed.php has been defined.');
-        }
-        require $seed;
+        seedDatabase(array_slice($argv,2));
         exit(0);
     }
 
     echo "Mini PHP console\n\n";
     echo "  php bin/console new <directory>\n";
     echo "  php bin/console migrate\n";
+    echo "  php bin/console migrate:fresh [--seed] [--minimal] [--force]\n";
+    echo "      Drops all tables/views and reruns migrations. --seed seeds every module; --minimal uses initial setup only; --force skips confirmation.\n";
     echo "  php bin/console migrate:status\n";
     echo "  php bin/console migrate:rollback\n";
-    echo "  php bin/console db:seed\n";
+    echo "  php bin/console db:seed [--minimal]\n";
+    echo "  php bin/console content:publish-demo\n";
 } catch (Throwable $e) {
     fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
     exit(1);
