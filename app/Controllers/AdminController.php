@@ -44,6 +44,7 @@ final class AdminController {
         }
         $inbox=DB::fetch('SELECT COUNT(*) total, COALESCE(SUM(status=\'new\'),0) fresh, COALESCE(SUM(status=\'in_progress\'),0) progress, COALESCE(SUM(status=\'resolved\'),0) resolved FROM inquiries');
         $this->render('dashboard',['title'=>'Overview','counts'=>$counts,'published'=>$published,'drafts'=>$drafts,'inbox'=>$inbox,
+            'distribution'=>DB::fetch('SELECT COUNT(*) total,MAX(recorded_at) latest FROM lucky_locations'),
             'recent'=>DB::fetchAll('SELECT p.*,c.name category_name FROM products p JOIN categories c ON c.id=p.category_id ORDER BY updated_at DESC,id DESC LIMIT 5'),
             'latestInquiries'=>DB::fetchAll("SELECT * FROM inquiries ORDER BY (status='new') DESC,created_at DESC,id DESC LIMIT 5"),
             'activity'=>DB::fetchAll('SELECT * FROM admin_activity ORDER BY id DESC LIMIT 6')]);
@@ -66,6 +67,37 @@ final class AdminController {
     public function form(string $type,?string $id=null): void {
         $this->type($type); $row=$id?DB::fetch("SELECT * FROM $type WHERE id=?",[(int)$id]):[];if($id&&!$row)not_found();
         $this->render('form',['title'=>($id?'Edit ':'Add ').self::TYPES[$type],'type'=>$type,'row'=>$row,'returnTo'=>$this->returnPath($type),'categories'=>DB::fetchAll('SELECT * FROM categories ORDER BY sort_order,name'),'relatedProducts'=>$type==='articles'?DB::fetchAll('SELECT id,name,published FROM products ORDER BY name'):[]]);
+    }
+    private function settingsContext(): array {
+        $returnTo=$this->returnPath('products');
+        $raw=input_text('ids',2200);$ids=$raw!==''?explode(',',$raw):[];
+        $hasPreview=count($ids)>0&&count($ids)<=200&&!array_filter($ids,fn($id)=>!preg_match('/^[1-9][0-9]{0,9}$/D',$id));
+        $single=$hasPreview&&count($ids)===1&&input_text('mode',10)==='single';
+        $previewPath=$returnTo;
+        if($hasPreview)$previewPath=$single?'admin/products/'.$ids[0].'/qr?'.http_build_query(['return_to'=>$returnTo]):'admin/products/qr?'.http_build_query(['ids'=>implode(',',$ids),'return_to'=>$returnTo]);
+        $settingsQuery=['return_to'=>$returnTo];
+        if($hasPreview)$settingsQuery+=['ids'=>implode(',',$ids),'mode'=>$single?'single':'batch'];
+        return compact('returnTo','previewPath','hasPreview','single','settingsQuery');
+    }
+    private function settingsPath(string $tab): string { return 'admin/settings?'.http_build_query(['tab'=>$tab]+$this->settingsContext()['settingsQuery']); }
+    public function qrSettings(): void { redirect($this->settingsPath('qr')); }
+    public function productQr(string $id): void {
+        if(!ctype_digit($id)||(int)$id<1)not_found();
+        $product=DB::fetch('SELECT id,name,product_code,published FROM products WHERE id=?',[(int)$id]);
+        if(!$product)not_found();
+        view('admin/product-qr',['title'=>'Print product QR code','products'=>[$product],'returnTo'=>$this->returnPath('products')],null);
+    }
+    public function productQrBatch(): void {
+        $raw=$_GET['ids']??'';
+        $ids=is_string($raw)&&strlen($raw)<=2200?explode(',',$raw):[];
+        if(!$ids||count($ids)>200||array_filter($ids,fn($id)=>!preg_match('/^[1-9][0-9]{0,9}$/D',$id)))
+            redirect($this->returnPath('products'),'Select between 1 and 200 products to print QR labels.','warning');
+        $ids=array_values(array_unique(array_map('intval',$ids)));
+        $rows=DB::fetchAll('SELECT id,name,product_code,published FROM products WHERE id IN ('.implode(',',array_fill(0,count($ids),'?')).')',$ids);
+        if(count($rows)!==count($ids))redirect($this->returnPath('products'),'Some selected products no longer exist. Clear the selection and select your products again.','warning');
+        $byId=array_column($rows,null,'id');
+        $products=array_map(fn($id)=>$byId[$id],$ids);
+        view('admin/product-qr',['title'=>'Print product QR labels','products'=>$products,'batch'=>true,'returnTo'=>$this->returnPath('products')],null);
     }
     private function upload(string $field, string $kind, array &$newFiles): ?string {
         $file=$_FILES[$field]??null; if(!$file||$file['error']===UPLOAD_ERR_NO_FILE)return null;
@@ -157,7 +189,14 @@ final class AdminController {
         DB::transaction(function()use($type,$id,$row){if($type==='products')DB::statement('UPDATE articles SET related_product_id=NULL WHERE related_product_id=?',[(int)$id]);DB::statement("DELETE FROM $type WHERE id=?",[(int)$id]);$this->activityLog('Deleted',$type,(int)$id,$row['name']??$row['title']);});
         $this->cleanFiles(array_intersect_key($row,array_flip(['image','data_sheet','safety_sheet','file'])));redirect($this->returnPath($type),'Record deleted.');
     }
-    public function settings(): void { $this->render('settings',['title'=>'Brand & website settings','row'=>settings()]); }
+    public function settings(): void {
+        $settingsTab=input_text('tab',20);
+        if(!in_array($settingsTab,['brand','account','qr']))$settingsTab='brand';
+        $context=$this->settingsContext();
+        $row=$settingsTab==='account'?DB::fetch('SELECT email FROM admins WHERE id=?',[$_SESSION['admin_id']]):settings();
+        $settingsAction=($settingsTab==='account'?'admin/account':'admin/settings').'?'.http_build_query(['tab'=>$settingsTab]+$context['settingsQuery']);
+        $this->render('settings-hub',['title'=>'Settings','settingsTab'=>$settingsTab,'settingsAction'=>$settingsAction,'row'=>$row]+$context);
+    }
     public function saveSettings(): void {
         $newFiles=[];$removed=[];
         try {
@@ -167,10 +206,10 @@ final class AdminController {
             if($data['company_name']===''||!preg_match('/^#[0-9a-fA-F]{6}$/',$data['theme_color']))throw new \InvalidArgumentException('Company name and a valid hex color are required.');
             foreach(['logo','favicon'] as $field) { $new=$this->upload($field,'image',$newFiles);if($new||isset($_POST['remove_'.$field])){$data[$field]=$new;$removed[]=settings()[$field];} }
             DB::transaction(function()use($data){DB::update('settings',1,$data);$this->activityLog('Updated','settings',1,'Brand & website settings');});$this->cleanFiles($removed);
-        }catch(\Throwable $e){$this->cleanFiles($newFiles);$this->fail(['form'=>$e instanceof \InvalidArgumentException?$e->getMessage():'Unable to save settings.'],'admin/settings');}
-        redirect('admin/settings','Website branding updated.');
+        }catch(\Throwable $e){$this->cleanFiles($newFiles);$this->fail(['form'=>$e instanceof \InvalidArgumentException?$e->getMessage():'Unable to save settings.'],$this->settingsPath('brand'));}
+        redirect($this->settingsPath('brand'),'Website branding updated.');
     }
-    public function account(): void { $this->render('account',['title'=>'Your account','row'=>DB::fetch('SELECT email FROM admins WHERE id=?',[$_SESSION['admin_id']])]); }
+    public function account(): void { redirect($this->settingsPath('account')); }
     private function inquiryQuery(): array {
         $filters=['q'=>input_text('q'),'status'=>input_text('status',20),'kind'=>input_text('kind',30),'from'=>input_text('from',10),'to'=>input_text('to',10)];$where='1=1';$bind=[];$errors=[];
         foreach(['status'=>['new','in_progress','resolved'],'kind'=>['product','complaint','general','distributor']] as $key=>$allowed)if(!in_array($filters[$key],$allowed))$filters[$key]='';
@@ -214,11 +253,11 @@ final class AdminController {
     }
     public function saveAccount(): void {
         $admin=DB::fetch('SELECT * FROM admins WHERE id=?',[$_SESSION['admin_id']]);
-        if(!is_string($_POST['current_password']??null)||!password_verify($_POST['current_password'],$admin['password']))$this->fail(['form'=>'Current password is incorrect.'],'admin/account');
+        if(!is_string($_POST['current_password']??null)||!password_verify($_POST['current_password'],$admin['password']))$this->fail(['form'=>'Current password is incorrect.'],$this->settingsPath('account'));
         $email=input_text('email',191,true);$password=$_POST['new_password']??'';$confirm=$_POST['confirm_password']??'';
-        if(!filter_var($email,FILTER_VALIDATE_EMAIL)||mb_strlen($email)>190||!is_string($password)||!is_string($confirm)||($password!==''&&(strlen($password)<12||strlen($password)>4096))||$password!==$confirm)$this->fail(['form'=>'Enter a valid email. Optional new passwords must match and contain at least 12 characters.'],'admin/account');
+        if(!filter_var($email,FILTER_VALIDATE_EMAIL)||mb_strlen($email)>190||!is_string($password)||!is_string($confirm)||($password!==''&&(strlen($password)<12||strlen($password)>4096))||$password!==$confirm)$this->fail(['form'=>'Enter a valid email. Optional new passwords must match and contain at least 12 characters.'],$this->settingsPath('account'));
         $data=['email'=>$email];if($password!=='')$data['password']=password_hash($password,PASSWORD_DEFAULT);
-        try { DB::transaction(function()use($data){DB::update('admins',(int)$_SESSION['admin_id'],$data);$this->activityLog('Updated','account',(int)$_SESSION['admin_id'],'Administrator sign-in details');}); }catch(\PDOException $e){$this->fail(['form'=>'Unable to update the account. Check whether that email is already in use.'],'admin/account');}
-        session_regenerate_id(true);redirect('admin/account','Account updated.');
+        try { DB::transaction(function()use($data){DB::update('admins',(int)$_SESSION['admin_id'],$data);$this->activityLog('Updated','account',(int)$_SESSION['admin_id'],'Administrator sign-in details');}); }catch(\PDOException $e){$this->fail(['form'=>'Unable to update the account. Check whether that email is already in use.'],$this->settingsPath('account'));}
+        session_regenerate_id(true);redirect($this->settingsPath('account'),'Account updated.');
     }
 }

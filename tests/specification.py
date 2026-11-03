@@ -1,7 +1,7 @@
 """Spec regression suite. Creates, serves and removes its own disposable MySQL DB.
 
 Run: python tests/specification.py
-Requires requests and (for visual checks) playwright plus system Microsoft Edge.
+Requires requests, opencv-python and (for visual checks) playwright plus system Microsoft Edge.
 Company database records and administrator passwords are never changed.
 """
 import base64
@@ -104,6 +104,8 @@ try:
     png = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aF1sAAAAASUVORK5CYII=')
     post('/admin/products/save', product, '/admin/products/create', files={'image': ('sample.png', png, 'image/png')})
     product_id = record_id('products', product['name'])
+    from product_qr import check_http as check_qr_http
+    check_qr_http(BASE, admin, public, get, product_id)
     detail = get(f'/products/{product_id}', public).text
     assert 'QA-001' in detail and 'QA-SPEC' in detail and 'QA-size' in detail
     assert 'alert(1)' not in detail and '<b>Test text</b>' in detail
@@ -214,6 +216,8 @@ try:
     assert 'QA Superking sample' in get('/admin/activity?q=QA+Superking+sample').text
     from admin_cases import check_content_workflows
     check_content_workflows(BASE, admin, public, get, post, record_id, category, png, pdf)
+    from product_qr_series import prepare as prepare_qr_series
+    qr_series_ids = prepare_qr_series(BASE, admin, public, get, post, record_id, category)
     print('PASS: public routes, localization, search/filters, CMS, publication checks, sanitization, uploads, inquiries, CSRF, spam limits and SEO.')
 
     from playwright.sync_api import sync_playwright
@@ -243,6 +247,10 @@ try:
         page.get_by_label('Password', exact=True).fill(password)
         page.get_by_role('button', name='Sign in').click()
         page.wait_for_url(BASE + '/admin')
+        from product_qr import check_browser as check_qr_browser
+        check_qr_browser(page, BASE, product_id, out)
+        from product_qr_series import check_browser as check_qr_series
+        check_qr_series(page, BASE, qr_series_ids, out)
         for width, height in [(1440, 960), (1280, 720), (1024, 768), (390, 844), (320, 700)]:
             page.set_viewport_size({'width': width, 'height': height})
             for path in ['/admin', '/admin/articles/create', '/admin/dealers/create', '/admin/documents/create', '/admin/manufacturing_updates/create', '/admin/settings', '/admin/account', '/admin/inquiries', '/admin/products', f'/admin/products/{product_id}/edit']:

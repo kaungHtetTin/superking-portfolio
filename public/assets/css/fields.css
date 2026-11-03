@@ -15,7 +15,8 @@ select:focus {
     outline: none;
 }
 @media (forced-colors: active) {
-    input:focus, textarea:focus, select:focus, .editor:focus-within {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):focus,
+    textarea:focus, select:focus, .editor:focus-within {
         border-color: Highlight;
         outline: 2px solid Highlight;
         outline-offset: -2px;

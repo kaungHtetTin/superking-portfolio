@@ -7,6 +7,7 @@
  ['Draft content',$contentDrafts,'admin#content-summary','Review before publishing']
 ] as [$label,$value,$path,$hint]): ?><a class="panel overview-metric" href="<?= url($path) ?>"><span><?= e($label) ?></span><strong><?= $value ?></strong><small><?= e($hint) ?> ↗</small></a><?php endforeach; ?>
 </div>
+<section class="panel" style="margin-bottom:14px"><div class="panel-heading"><div><span class="eyebrow">PRODUCT DISTRIBUTION</span><h2><?= number_format($distribution['total']) ?> recorded reveal locations</h2><p>See where customers first revealed their promotional codes, with dates and location accuracy.</p></div><a class="btn btn-primary" href="<?= url('admin/distribution') ?>">View distribution map</a></div></section>
 <div class="dashboard-grid">
 <section class="panel"><div class="panel-heading"><div><span class="eyebrow">CUSTOMER SUPPORT & BUSINESS</span><h2>Latest inquiries</h2></div><a class="btn btn-primary" href="<?= url('admin/inquiries') ?>">Open inbox</a></div>
 <div class="table-wrap"><table><thead><tr><th>Reference / sender</th><th>Type</th><th>Status</th><th>Received</th><th>Action</th></tr></thead><tbody>

@@ -1,0 +1,6 @@
+<?php
+return ['up' => [
+    "CREATE TABLE lucky_campaigns (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, starts_on DATE NOT NULL, ends_on DATE NOT NULL, instructions TEXT NOT NULL, total_codes INT UNSIGNED NOT NULL, status VARCHAR(12) NOT NULL DEFAULT 'draft', generated_at DATETIME NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    "CREATE TABLE lucky_prizes (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, campaign_id BIGINT UNSIGNED NOT NULL, name VARCHAR(190) NOT NULL, quantity INT UNSIGNED NOT NULL, CONSTRAINT lucky_prize_campaign FOREIGN KEY (campaign_id) REFERENCES lucky_campaigns(id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    "CREATE TABLE lucky_codes (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, campaign_id BIGINT UNSIGNED NOT NULL, code CHAR(24) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE, prize_id BIGINT UNSIGNED NULL, revealed_at DATETIME NULL, redeemed_at DATETIME NULL, redeemed_by BIGINT UNSIGNED NULL, INDEX lucky_campaign_codes (campaign_id,id), CONSTRAINT lucky_code_campaign FOREIGN KEY (campaign_id) REFERENCES lucky_campaigns(id), CONSTRAINT lucky_code_prize FOREIGN KEY (prize_id) REFERENCES lucky_prizes(id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+], 'down' => []];

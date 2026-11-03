@@ -111,6 +111,47 @@ Use the existing admin login. The sidebar contains products, categories, homepag
 
 Brand & settings includes the company introduction, Myanmar introduction, SEO description, approved logo/favicon, GA4 measurement ID and Search Console verification token. Public colors follow the concept palette; the editable accent controls the admin theme. Homepage banners appear as accessible announcements below the main brand hero.
 
+## Product QR labels
+
+In **Products**, select product checkboxes and choose **Print selected QR codes** for batch printing. The header checkbox selects the current page; selections remain available across pages and filters in the same tab. Use **Clear selection** to start again. A batch supports up to 200 products, in selection order. Choose **Print QR** from a product row or its edit screen for a single product. A separate tab shows a printable label with the company name, product name/code and a QR code linking to the public `products/{id}` detail page. Choose **Print QR code** to print or save as PDF. The QR code is generated locally using the bundled [Project Nayuki library](https://www.nayuki.io/page/qr-code-generator-library) (MIT); no external QR service is required.
+
+Open **Settings > QR printing**, or **QR print settings** from the Products list or print preview to configure QR size (15-100 mm including its quiet zone), codes per page (1-100), copies per product (1-100, up to 1,000 labels per batch), A4/A5/Letter/custom paper, orientation, page margin, label font size and caption. Company name, product name, product code, website address and label borders can be toggled. Settings are remembered in this browser. Use **Save and return to preview** to apply changes to the current print batch, or **Save settings** when opening settings from the Products list. **Cancel** keeps the saved settings. **Reset settings** restores defaults in the form; save to apply them. The settings page preserves the selected products and list filters when returning to the preview. Copies are grouped by product. The preview automatically arranges labels into rows and columns and splits them into pages. Layouts that cannot fit the requested QR size and label text disable printing with a corrective message. Choose matching paper in the printer, 100% scale and no browser headers/footers. Custom dimensions are used as entered in portrait mode and swapped in landscape mode.
+
+Publish the product before distributing labels. Draft labels show a reminder because their public pages return 404 until published. Set `APP_URL` to the full public website URL (including any installation subdirectory) before printing customer labels; a localhost link only works on the same computer. The print view warns about loopback addresses. Reprint labels if the website address changes; the encoded product ID stays the same when product content is edited. Print actions open separately so list filters and unsaved edits stay in the original tab.
+
+## Instant-win promotions
+
+Open **Lucky draw** in the admin sidebar. Customers do not need an account or registration.
+
+1. **Create promotion:** enter its name, first/last play dates, total codes (up to 10,000), collection instructions, and any prize names/quantities. For cashback, include the fixed amount and currency in the prize name, for example **5,000 MMK cashback**. Books, smartwatches and other items work the same way. Winning quantities cannot exceed total codes; remaining codes are non-winning. Dates cover whole days in Myanmar time. Campaign details are fixed after creation.
+2. **Generate codes:** generates one immutable set of unpredictable, single-use codes, with winning assignments shuffled using cryptographic randomness. Generate can run only once. **Print codes** opens the browser print dialog automatically once the QR labels are ready. Labels are provided in groups of up to 100, with 16 per A4 page; **Export CSV** provides the full batch of codes and QR URLs without prize assignments. Reprints/exports contain the same codes: never distribute duplicates. Set `APP_URL` to the full public HTTPS website address before printing for customers. Keep labels concealed under scratch-off covering, inside packaging, or on sealed purchase vouchers.
+3. **Activate promotion:** only active campaigns within their dates accept new plays. Pause or close to stop new plays. Existing results and collection stay available. Closed promotions can be reactivated, subject to their original dates.
+
+Customers scan a label or enter the printed code at `/lucky-draw`, then tap **Reveal prize** and allow location access. Location is required for the first reveal; denial, unsupported positioning or invalid coordinates leave the code unused. The page explains the collection purpose before requesting browser permission and provides retry guidance. Opening a link alone never consumes a play. The result is saved on the server; refreshes, other browsers and repeat scans keep the same result. The customer page supports English and Myanmar and does not load analytics or third-party assets. Keep the code and original label private: possession of the code grants access to its result. There is one play per code, not one play per person.
+
+At collection, authorized staff opens **Lucky draw > Give a prize**, enters the original label code, checks the reward, hands over the item or cashback, and taps **Confirm prize given**. Collection is recorded once with the staff ID and time, and the customer page then shows **Already collected**. Unrevealed and non-winning codes cannot be redeemed. Cashback is paid manually at the counter; the app records fulfilment and does not transfer money. The existing admin login provides staff access; separate dealer accounts are not included.
+
+Campaign creation, code generation, status changes, exports and prize collection appear in activity history. Code generation, revealing and collection use transactional/conditional writes to prevent duplicate allocations and redemptions. Promotion tables are additive and have no destructive rollback.
+
+Run `python tests/lucky_draw.py` for isolated integration and Edge checks: exact allocation, authentication/CSRF, unrevealed-result privacy, repeat results, campaign dates/status, collection guards, CSV, QR decoding, A4 PDF page counts, responsive screens and dark mode. It creates and removes its own disposable database and does not create campaigns in the company database.
+
+## Product distribution locations
+
+Open **Product distribution** in the admin sidebar, or **View distribution map** on Overview. Each promotion also has a filtered **Distribution map** link.
+
+- A separate `lucky_locations` table stores the first reveal's latitude, longitude, reported accuracy in metres, associated code ID, disclosure version and server-recorded UTC date/time. The admin report and CSV display Myanmar time. The location insert and prize reveal share one transaction, and the code ID is unique: repeated requests cannot duplicate or overwrite a location. Both winning and non-winning first reveals are included. Previously revealed codes have no historical coordinates and remain accessible.
+- The customer page requests a fresh high-accuracy device position only after **Reveal prize** is pressed. It does not watch or track the device continuously. Browser permission and location services are necessary. Use HTTPS on the public customer site; localhost is a development exception, while a phone opening an ordinary HTTP LAN address generally cannot provide location. Missing JavaScript, denied permission, timeout and unavailable positioning cannot consume a code. No IP-based location fallback is used.
+- The server checks consent-notice version, finite coordinate ranges and accuracy before accepting the first reveal. Browser-supplied coordinates can be inaccurate or altered; they indicate the reported reveal location, not a verified purchase/delivery point or complete product journey. A campaign describes the promotion; codes are not currently linked to individual product SKUs.
+- Filter the report by promotion and inclusive Myanmar dates. Every filtered record appears on the map; exact overlaps share a marker and count. The list is paginated at 50 records, includes reported accuracy and date/time, and **Show on map** centers the selected position and accuracy circle. **Export CSV** exports all matching records with only code endings, keeping full bearer codes out of the report. Invalid filters show errors and do not broaden results.
+- Coordinates are available only to signed-in administrators. Reports are not cached. Customer pages disclose the purpose and link to the updated privacy notice. Location records currently remain until the team removes them; no automatic retention expiry is configured.
+- [Leaflet 1.9.4](https://leafletjs.com/reference-1.9.4.html) is bundled locally under `public/assets/js/vendor/leaflet/` with its BSD license. Map backgrounds use standard [OpenStreetMap tiles](https://operations.osmfoundation.org/policies/tiles/) with visible attribution and normal browser caching; there is no tile prefetching. Tiles require internet access. The tile service receives the admin's viewport requests, not names or promotional codes. If tiles fail, markers/coordinates and CSV remain available. The page sends only the origin as its cross-origin referrer.
+
+`python tests/lucky_draw.py` also verifies required location validation, permission denial/unavailable/timeout retries, real browser geolocation with simulated consented coordinates, one record per first reveal, protected reports/exports, timezone boundaries, filters, pagination, and responsive map controls. Map tiles are mocked in automated QA; no real customer location is collected by the tests.
+
+## Combined settings
+
+The sidebar has one **Settings** entry with inner navigation tabs for **Brand & website**, **Your account** and **QR printing**. Each tab has its own save action. Brand and account changes retain server validation and current-password checks; QR preferences remain stored in the current browser. Existing account and QR-settings URLs redirect to the corresponding tab. QR product selections and list filters remain attached when switching tabs and after saving or validation errors, so returning to the print preview keeps the current batch.
+
 ## Daily admin workflows
 
 The Overview reads live database counts for new/in-progress inquiries and published/draft content. Each count links to its working list. Latest inquiries, recently edited products and recent staff activity are shown on the dashboard.
@@ -146,7 +187,7 @@ Production hosting must configure HTTPS, scheduled backups, log rotation, uptime
 ## Verification
 
 ~~~powershell
-python -m pip install requests playwright
+python -m pip install requests playwright opencv-python
 python tests/specification.py
 python tests/browser.py
 python tests/product_search.py
@@ -154,7 +195,7 @@ python tests/migrate_fresh.py
 python tests/seeding.py
 ~~~
 
-The specification suite creates a uniquely named disposable database, runs migrations/seed, starts a local PHP server, validates CMS workflows, upload rejection, review/verification gates, translations, catalogue filters, inquiry persistence/status/deletion, CSRF, spam limits and sitemap behavior, then checks responsive layouts and admin theme/density in system Microsoft Edge. It removes its own database and server afterward. It never changes the company admin password or company database.
+The specification suite creates a uniquely named disposable database, runs migrations/seed, starts a local PHP server, validates CMS workflows, upload rejection, review/verification gates, translations, catalogue filters, inquiry persistence/status/deletion, CSRF, spam limits and sitemap behavior, then checks responsive layouts and admin theme/density in system Microsoft Edge. QR checks decode single and batch images with OpenCV, verify exact QR dimensions and multi-page PDF counts, saved settings, label contents, paper sizes, selection across pages, filtered returns and unsaved-edit preservation. It removes its own database and server afterward. It never changes the company admin password or company database.
 
 The integration entry point invokes the same isolated suite. Browser and search scripts are read-only checks against SK_TEST_URL (default XAMPP URL). Browser screenshots go to ignored storage/qa/.
 
