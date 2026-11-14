@@ -100,17 +100,17 @@ def check_content_workflows(base, admin, public, get, post, record_id, category,
         post(f'/admin/{kind}/{records[kind]}/delete', {}, '/admin/' + kind)
         assert data[name_key] not in get('/admin/' + kind + '?q=Workflow').text
 
-    settings = {'company_name': 'Workflow Brand', 'tagline': 'Workflow tagline', 'theme_color': '#C1121F', 'intro': 'Workflow company introduction', 'intro_my': '', 'meta_description': 'Workflow SEO description', 'ga4_id': '', 'search_console_token': 'workflow-verification'}
+    settings = {'company_name': 'Workflow Brand', 'tagline': 'Workflow tagline', 'theme_color': '#C1121F', 'intro': 'Workflow company introduction', 'intro_my': '', 'meta_description': 'Workflow SEO description'}
     post('/admin/settings', dict(settings, theme_color='bad'), '/admin/settings', error=True)
     post('/admin/settings', settings, '/admin/settings', files={'logo': ('logo.png', png, 'image/png'), 'favicon': ('favicon.png', png, 'image/png')})
     home = get('/', public).text
-    assert 'Workflow SEO description' in home and 'workflow-verification' in home
+    assert 'Workflow SEO description' in home
     assert 'Workflow company introduction' in home and 'Workflow Brand' in home
     assert 'uploads/' in home
     post('/admin/settings', dict(settings, remove_logo=1, remove_favicon=1), '/admin/settings')
     assert 'superking-logo.webp' in get('/', public).text
     assert 'Brand & website settings' in html.unescape(get('/admin/activity?type=settings').text)
-    post('/admin/settings', dict(settings, company_name='SUPERKING LUBRICANTS', intro='SUPERKING LUBRICANTS has been imported from the UAE and distributed in Myanmar since 2016 by Royal Myanmar King Company Limited.', meta_description='', search_console_token=''), '/admin/settings')
+    post('/admin/settings', dict(settings, company_name='SUPERKING LUBRICANTS', intro='SUPERKING LUBRICANTS has been imported from the UAE and distributed in Myanmar since 2016 by Royal Myanmar King Company Limited.', meta_description=''), '/admin/settings')
     assert 'New inquiries' in get('/admin').text
     print('PASS: all nine CMS create/edit/publish/delete flows, filtered returns, previews, pagination, upload replacement/removal, settings propagation and activity history.')
 

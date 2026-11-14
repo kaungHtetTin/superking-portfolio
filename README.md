@@ -95,7 +95,7 @@ Demo PDF fixtures live in public/assets/documents/demo/. They are training attac
 - Distributor/export form and product, complaint/authenticity and general contact forms.
 - Inquiries are stored in the admin inbox. Confirmation displays a unique reference. **Email notifications are not configured. Staff must monitor the inbox.**
 - Approved company profiles, catalogues, technical documents and certificates can be uploaded as PDFs.
-- Sitemap, robots, organization structured data, editable metadata/image alt text, optional Search Console token and consent-controlled GA4.
+- Sitemap, robots, organization structured data, editable metadata/image alt text.
 
 ## Staff CMS
 
@@ -109,7 +109,7 @@ Use the existing admin login. The sidebar contains products, categories, homepag
 6. Check both languages using **View website**.
 7. Open **Inquiry inbox**, search by name/reference or filter by status, open a submission, respond through confirmed company channels and update its handling status. Permanent deletion uses the confirmation dialog.
 
-Brand & settings includes the company introduction, Myanmar introduction, SEO description, approved logo/favicon, GA4 measurement ID and Search Console verification token. Public colors follow the concept palette; the editable accent controls the admin theme. Homepage banners appear as accessible announcements below the main brand hero.
+Brand & settings includes the company introduction, Myanmar introduction, SEO description, and approved logo/favicon. Public colors follow the concept palette; the editable accent controls the admin theme. Homepage banners appear as accessible announcements below the main brand hero.
 
 ## Product QR labels
 

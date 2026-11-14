@@ -201,8 +201,7 @@ final class AdminController {
         $newFiles=[];$removed=[];
         try {
             $data=['company_name'=>$this->text('company_name'),'tagline'=>$this->text('tagline',255),'intro'=>$this->text('intro',10000),'theme_color'=>$this->text('theme_color',7),'carousel_autoplay'=>isset($_POST['carousel_autoplay'])?1:0];
-            $data+=['intro_my'=>$this->text('intro_my',10000),'meta_description'=>$this->text('meta_description',500),'ga4_id'=>$this->text('ga4_id',30),'search_console_token'=>$this->text('search_console_token')];
-            if($data['ga4_id']!==''&&!preg_match('/^G-[A-Z0-9]+$/',$data['ga4_id']))throw new \InvalidArgumentException('Use a GA4 measurement ID such as G-XXXXXXXXXX.');
+            $data+=['intro_my'=>$this->text('intro_my',10000),'meta_description'=>$this->text('meta_description',500)];
             if($data['company_name']===''||!preg_match('/^#[0-9a-fA-F]{6}$/',$data['theme_color']))throw new \InvalidArgumentException('Company name and a valid hex color are required.');
             foreach(['logo','favicon'] as $field) { $new=$this->upload($field,'image',$newFiles);if($new||isset($_POST['remove_'.$field])){$data[$field]=$new;$removed[]=settings()[$field];} }
             DB::transaction(function()use($data){DB::update('settings',1,$data);$this->activityLog('Updated','settings',1,'Brand & website settings');});$this->cleanFiles($removed);
