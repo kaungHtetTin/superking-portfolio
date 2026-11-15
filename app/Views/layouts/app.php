@@ -12,6 +12,7 @@ if(preg_match('#^https?://#',(string)env('APP_URL',''))) {
 <!doctype html><html lang="<?= language() ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <?php if(!empty($adminPreview)): ?><meta name="robots" content="noindex,nofollow"><?php endif; ?><title><?= e($title??$brand['company_name']) ?> | <?= e($brand['company_name']) ?></title>
 <meta name="description" content="<?= e(mb_substr(strip_tags($meta),0,160)) ?>"><meta name="theme-color" content="#FFD130">
+<?php if(trim($brand['meta_keywords']??'')!==''): ?><meta name="keywords" content="<?= e($brand['meta_keywords']) ?>"><?php endif; ?>
 <link rel="canonical" href="<?= e($canonical) ?>"><?php foreach(['en','my'] as $lang): ?><link rel="alternate" hreflang="<?= $lang ?>" href="<?= e(preg_replace('/lang=(en|my)/','lang='.$lang,$canonical)) ?>"><?php endforeach; ?>
 <link rel="icon" href="<?= e($brand['favicon']?media($brand['favicon']):asset('images/favicon.svg')) ?>">
 <?php require BASE_PATH.'/app/Views/partials/styles.php'; ?>
