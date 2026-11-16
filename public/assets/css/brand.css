@@ -32,6 +32,8 @@ html:has(.public-site){scroll-padding-top:110px}html[lang=my] .public-site h1,ht
 .public-site .learning-card img{width:100%;height:190px;object-fit:cover}
 .public-site .announcements img{width:260px;height:160px;object-fit:cover;border-radius:4px}
 .public-site .application-strip{padding-top:20px}
+.public-site .dealer-banner,.public-site .contact-banner,.public-site .distributor-banner{padding-top:20px}
+.public-site .dealer-banner>img,.public-site .contact-banner>img,.public-site .distributor-banner>img{display:block;width:100%;height:auto;border-radius:6px}
 .public-site .application-strip>img{display:block;width:100%;height:220px;object-fit:cover;object-position:center 52%;border-radius:6px}
 @media(max-width:760px){.public-site .application-strip>img{height:170px}.public-site .announcements img{width:100%;height:180px}}
 

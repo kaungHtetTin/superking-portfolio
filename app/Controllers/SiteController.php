@@ -25,7 +25,7 @@ final class SiteController {
         $options=[]; foreach(['viscosity','specification','vehicle_types'] as $col) $options[$col]=DB::fetchAll("SELECT DISTINCT $col value FROM products WHERE published=1 AND $col<>'' ORDER BY $col");
         $total = (int) DB::fetchValue("SELECT COUNT(*) FROM products p JOIN categories c ON c.id=p.category_id WHERE $where",$bind);
         $pages = max(1,(int)ceil($total/12)); $page = max(1,min($pages,(int)($_GET['page']??1))); $offset=($page-1)*12;
-        view('site/products', ['title'=>t('Product catalogue','ကုန်ပစ္စည်းစာရင်း'),'filters'=>$filters,'options'=>$options,'q'=>$q,'category'=>$category,'page'=>$page,'pages'=>$pages,'total'=>$total,'categories'=>DB::fetchAll('SELECT * FROM categories ORDER BY sort_order,id'),'products'=>DB::fetchAll("SELECT p.*,c.name category_name,c.name_my category_name_my FROM products p JOIN categories c ON c.id=p.category_id WHERE $where ORDER BY p.featured DESC,p.name LIMIT 12 OFFSET $offset",$bind)]);
+        view('site/products', ['title'=>t('Product Catalogue','ကုန်ပစ္စည်းစာရင်း'),'filters'=>$filters,'options'=>$options,'q'=>$q,'category'=>$category,'page'=>$page,'pages'=>$pages,'total'=>$total,'categories'=>DB::fetchAll('SELECT * FROM categories ORDER BY sort_order,id'),'products'=>DB::fetchAll("SELECT p.*,c.name category_name,c.name_my category_name_my FROM products p JOIN categories c ON c.id=p.category_id WHERE $where ORDER BY p.featured DESC,p.name LIMIT 12 OFFSET $offset",$bind)]);
     }
     public function product(string $id): void {
         $product = DB::fetch('SELECT p.*,c.name category_name,c.name_my category_name_my FROM products p JOIN categories c ON c.id=p.category_id WHERE p.id=? AND p.published=1',[(int)$id]);
@@ -48,9 +48,9 @@ final class SiteController {
         $q=input_text('q');$region=input_text('region');$where='published=1 AND (verified=1 OR LEFT(seed_key,5)=0x64656d6f2e)';$bind=[];
         if($region!==''){$where.=' AND region=?';$bind[]=$region;}
         if($q!==''){ $where.=" AND CONCAT_WS(' ',title,title_my,city,township,address) LIKE ? ESCAPE '!'";$bind[]='%'.str_replace(['!','%','_'],['!!','!%','!_'],$q).'%'; }
-        view('site/dealers',['title'=>t('Find a Dealer','အရောင်းကိုယ်စားလှယ် ရှာရန်'),'q'=>$q,'region'=>$region,'regions'=>DB::fetchAll('SELECT DISTINCT region FROM dealers WHERE published=1 AND (verified=1 OR LEFT(seed_key,5)=0x64656d6f2e) ORDER BY region'),'dealers'=>DB::fetchAll("SELECT * FROM dealers WHERE $where ORDER BY sort_order,title",$bind)]);
+        view('site/dealers',['title'=>t('Find A Dealer','အရောင်းကိုယ်စားလှယ် ရှာရန်'),'q'=>$q,'region'=>$region,'regions'=>DB::fetchAll('SELECT DISTINCT region FROM dealers WHERE published=1 AND (verified=1 OR LEFT(seed_key,5)=0x64656d6f2e) ORDER BY region'),'dealers'=>DB::fetchAll("SELECT * FROM dealers WHERE $where ORDER BY sort_order,title",$bind)]);
     }
-    public function distributor(): void { view('site/distributor',['title'=>t('Become a Distributor','ဖြန့်ချိရေး မိတ်ဖက်ဖြစ်ရန်'),'documents'=>approved_documents(),'kind'=>'distributor']); }
+    public function distributor(): void { view('site/distributor',['title'=>t('Become A Distributor','ဖြန့်ချိရေး မိတ်ဖက်ဖြစ်ရန်'),'documents'=>approved_documents(),'kind'=>'distributor']); }
     public function privacy(): void { view('site/privacy',['title'=>t('Privacy notice','ကိုယ်ရေးအချက်အလက် မူဝါဒ')]); }
     public function inquiry(): void {
         $kind=input_text('kind',30,true);$path=$kind==='distributor'?'distributor':'contact';
