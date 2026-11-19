@@ -35,6 +35,10 @@ with sync_playwright() as playwright:
     page.goto(BASE)
     page.get_by_role('button', name='Open navigation').click()
     assert page.get_by_role('navigation', name='Main navigation').is_visible()
+    menu_style = page.locator('#site-nav').evaluate("nav => ({background: getComputedStyle(nav).backgroundColor, color: getComputedStyle(nav).color, top: nav.getBoundingClientRect().top, headerBottom: document.querySelector('.site-header').getBoundingClientRect().bottom})")
+    assert menu_style['background'] == 'rgb(31, 31, 31)', menu_style
+    assert menu_style['color'] == 'rgb(245, 245, 245)', menu_style
+    assert abs(menu_style['top'] - (menu_style['headerBottom'] - 3)) < 1, menu_style
     page.keyboard.press('Escape')
     assert page.locator('.menu-toggle').get_attribute('aria-expanded') == 'false'
     page.locator('.language-switch').click()
